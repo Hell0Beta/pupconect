@@ -1,0 +1,652 @@
+﻿@page
+@model IndexModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PawConnect | Modern Pet Finder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #1d4ed8;
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --text-color: #1f2937;
+            --light-text: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 100%;
+
+        }
+
+        nav {
+            background-color: var(--card-background);
+            padding: 1rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 220px;
+            background: linear-gradient(rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: white;
+            background-color: var(--primary-color);
+            border-radius: 0.375rem;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .dog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .dog-card {
+            background-color: var(--card-background);
+            border-radius: 0.5rem;
+            display: flex;
+            padding: 20px;
+            margin: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .dog-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .dog-image {
+            height: 200px;
+            background: url('/api/placeholder/300/200') center/cover;
+        }
+
+        .dog-info {
+            padding: 1.5rem;
+        }
+
+        .dog-info h3 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .search-container {
+            margin: 2rem auto;
+            text-align: center;
+        }
+
+        .search-box {
+            padding: 0.75rem;
+            width: 80%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            margin-right: 0.5rem;
+        }
+
+        footer {
+            background-color: var(--card-background);
+            color: var(--light-text);
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .feature i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        @@media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        #pages>div {
+            display: none;
+        }
+
+        #pages>div.active {
+            display: block;
+        }
+
+        #map {
+            height: 400px;
+            width: 80%;
+            border: 1px black solid;
+        }
+
+        #coordinates {
+            margin-top: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #lat,
+        #lon {
+            font-weight: bold;
+        }
+
+        #reader {
+            width: 400px;
+            height: 400px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            min-height: 50px;
+            width: 380px;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #status {
+            margin: 10px 0;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="container">
+            <a href="#" class="logo" onclick="showPage('home')">🐾 PawConnect</a>
+            <div class="nav-links">
+                <a href="#" onclick="showPage('home')">Home</a>
+                <a href="#" onclick="showPage('login')">Login</a>
+                <a href="#" onclick="showPage('register')">Register Pet</a>
+                <a href="#" onclick="showPage('lost')">Lost Pets</a>
+                <a href="#" onclick="showPage('report')">Report</a>
+                <a href="#" onclick="showPage('user-homepage')">User Homepage</a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="pages">
+        <!-- Home Page -->
+        <div id="home" class="active">
+
+            <section class="hero">
+                <div class="container">
+                    <h1>Reunite Lost Pets with Their Families</h1>
+                    <p style="color: var(--light-text); margin-bottom: 2rem;">Fast, reliable pet recovery service
+                        powered by community</p>
+                    <div class="cta-buttons">
+                        <a href="#" class="btn" onclick="showPage('report')">Report Found Pet</a>
+                        <a href="#" class="btn btn-outline" onclick="showPage('lost')">Search Lost Pets</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="container">
+                <div class="dog-card">
+                    <div class="dog-image"><img src="_08c39c20-e9fc-45da-82a4-9c190bbad32f.png" alt="Your Mutt"></div>
+                    <div class="dog-info">
+                        <h3>Golden Retriever</h3>
+                        <p><strong>Name:</strong> Max</p>
+                        <p><strong>Lost:</strong> Central Park</p>
+                        <p><strong>Date:</strong> Oct 1, 2024</p>
+                        <p><strong>Status:</strong> At shelter</p>
+                        <a href="#" class="btn" style="margin-top: 1rem;">Contact Finder</a>
+                    </div>
+                    <div id="map">
+
+                    </div>
+                    <div id="coordinates">
+                        Latitude: <span id="lat"></span>, Longitude: <span id="lon"></span>
+                    </div>
+
+
+                </div>
+            </section>
+
+            <div class="container">
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-qrcode"></i>
+                        <h2>Quick Registration</h2>
+                        <p>Register your pet with our digital ID system for fast identification</p>
+                    </div>
+                    <!-- <div class="feature">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h2>Location Tracking</h2>
+                        <p>Real-time updates on found pets in your area</p>
+                    </div> -->
+                    <div class="feature">
+                        <i class="fas fa-users"></i>
+                        <h2>Community Network</h2>
+                        <p>Connect with local pet lovers to expand your search</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Login Page -->
+        <div id="login">
+            <div class="container">
+                <div class="card">
+                    <h2>Welcome Back</h2>
+                    <p style="color: var(--light-text); margin-bottom: 1.5rem;">Sign in to your account</p>
+                    <form onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <button class="btn" style="width: 100%;">Sign In</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Pet Page -->
+        <div id="register">
+            <div class="container">
+                <div class="card">
+                    <h2>Register Your Pet</h2>
+                    <form onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="petName">Pet's Name</label>
+                            <input type="text" id="petName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="breed">Breed</label>
+                            <input type="text" id="breed" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" rows="3"></textarea>
+                        </div>
+                        <button class="btn" style="width: 100%;">Register Pet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lost Pets Page -->
+        <div id="lost">
+            <div class="container">
+                <h2 style="text-align: center;">Lost Pets</h2>
+                <div class="search-container">
+                    <input type="text" class="search-box" placeholder="Search by breed, location, etc...">
+                    <button class="btn">Search</button>
+                </div>
+                <div class="dog-grid">
+                    <div class="dog-card">
+                        <div class="dog-image"></div>
+                        <div class="dog-info">
+                            <h3>Golden Retriever</h3>
+                            <p><strong>Name:</strong> Max</p>
+                            <p><strong>Lost:</strong> Central Park</p>
+                            <p><strong>Date:</strong> Oct 1, 2024</p>
+                            <p><strong>Status:</strong> At shelter</p>
+                            <a href="#" class="btn" style="margin-top: 1rem;">Contact Finder</a>
+                        </div>
+                    </div>
+                    <div class="dog-card">
+                        <div class="dog-image"></div>
+                        <div class="dog-info">
+                            <h3>Labrador</h3>
+                            <p><strong>Name:</strong> Unknown</p>
+                            <p><strong>Lost:</strong> Main Street</p>
+                            <p><strong>Date:</strong> Sept 30, 2024</p>
+                            <p><strong>Status:</strong> With finder</p>
+                            <a href="#" class="btn" style="margin-top: 1rem;">Contact Finder</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Pet Page -->
+        <div id="report">
+            <div class="container">
+                <div class="card">
+                    <h2>Report a Pet</h2>
+                    <form onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="reportType">Report Type</label>
+                            <select id="reportType" required>
+                                <option value="lost">Lost Pet</option>
+                                <option value="found">Found Pet</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reportBreed">Breed</label>
+                            <input type="text" id="reportBreed" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactInfo">Contact Information</label>
+                            <input type="tel" id="contactInfo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="additionalInfo">Additional Information</label>
+                            <textarea id="additionalInfo" rows="3"></textarea>
+                        </div>
+                        <h1>QR Code Scanner</h1>
+                        <div id="status">Click "Start Scanner" to begin</div>
+                        <button id="startButton">Start Scanner</button>
+                        <button id="stopButton" style="display: none;">Stop Scanner</button>
+                        <div id="reader"></div>
+                        <div id="result">Scan result will appear here</div>
+
+                        <button class="btn" style="width: 100%;">Submit Report</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="user-homepage">
+            <section class="container">
+                <div class="dog-card">
+                    <div class="dog-image"><img src="_08c39c20-e9fc-45da-82a4-9c190bbad32f.png" alt="Your Mutt"></div>
+                    <div class="dog-info">
+                        <h3>Golden Retriever</h3>
+                        <p><strong>Name:</strong> Max</p>
+                        <p><strong>Lost:</strong> Central Park</p>
+                        <p><strong>Date:</strong> Oct 1, 2024</p>
+                        <p><strong>Status:</strong> At shelter</p>
+                        <a href="#" class="btn" style="margin-top: 1rem;">Contact Finder</a>
+                    </div>
+                    <div id="map">
+
+                    </div>
+                    <div id="coordinates">
+                        Latitude: <span id="lat"></span>, Longitude: <span id="lon"></span>
+                    </div>
+
+
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 PawConnect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+
+        function showPage(pageId) {
+            document.querySelectorAll('#pages > div').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Website Loaded Successfully');
+        });
+
+
+        var map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap & Paw Connect 🐶</a> contributors'
+        }).addTo(map);
+
+        var marker;
+
+        function updatePosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+        @* var lat = document.getElementById('la').value;
+                var lon = document.getElementById('lo').value; *@
+
+                document.getElementById('lat').textContent = lat.toFixed(3);
+            document.getElementById('lon').textContent = lon.toFixed(3);
+        @* document.getElementById('lat').textContent = lat;
+                document.getElementById('lon').textContent = lon; *@
+
+            if (marker) {
+                marker.setLatLng([lat, lon]);
+            } else {
+                marker = L.marker([lat, lon]).addTo(map);
+            }
+
+            map.setView([lat, lon], 13);
+        }
+
+        //  Error handing for failed location request
+        function handleError(error) {
+            console.error("Error getting location:", error.message);
+        }
+
+        // 
+        if ("geolocation" in navigator) {
+            navigator.geolocation.watchPosition(updatePosition, handleError);
+        } else {
+            alert("Geolocation is not supported by your browser");
+        }
+
+
+        let html5QrCode;
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const statusDiv = document.getElementById('status');
+
+        startButton.addEventListener('click', startScanner);
+        stopButton.addEventListener('click', stopScanner);
+
+        function startScanner() {
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: 250
+                },
+                onScanSuccess,
+                onScanError
+            ).then(() => {
+                startButton.style.display = 'none';
+                stopButton.style.display = 'block';
+                statusDiv.textContent = 'Scanner is running...';
+            }).catch((err) => {
+                statusDiv.textContent = `Error starting scanner: ${err}`;
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    startButton.style.display = 'block';
+                    stopButton.style.display = 'none';
+                    statusDiv.textContent = 'Scanner stopped';
+                });
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById('result').innerHTML =
+                `<strong>Scanned QR Code:</strong><br>${decodedText}`;
+        }
+
+        function onScanError(errorMessage) {
+            // We can handle errors here if needed
+            console.error(errorMessage);
+        }
+    </script>
+</body>
+
+</html>
