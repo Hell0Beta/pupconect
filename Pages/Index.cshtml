@@ -1,5 +1,8 @@
 ﻿@page
 @model IndexModel
+@{
+    var results = ViewData["results"] as IEnumerable<ReportPetForm>;
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -167,7 +170,7 @@
 
         .dog-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
         }
 
@@ -175,7 +178,7 @@
             background-color: var(--card-background);
             border-radius: 0.5rem;
             display: flex;
-            padding: 20px;
+            padding: 60px;
             margin: 10px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -276,8 +279,8 @@
         }
 
         #reader {
-            width: 400px;
-            height: 400px;
+            width: 450px;
+            height: 300px;
             border: 2px solid #ccc;
             border-radius: 10px;
             overflow: hidden;
@@ -330,7 +333,8 @@
         <div id="home" class="active">
 
             <section class="hero">
-                <div class="container">
+                <div class="container" style="background-image: url(~/img/Design Collection.jpeg);">
+
                     <h1>Reunite Lost Pets with Their Families</h1>
                     <p style="color: var(--light-text); margin-bottom: 2rem;">Fast, reliable pet recovery service
                         powered by community</p>
@@ -343,7 +347,8 @@
 
             <section class="container">
                 <div class="dog-card">
-                    <div class="dog-image"><img src="_08c39c20-e9fc-45da-82a4-9c190bbad32f.png" alt="Your Mutt"></div>
+                    <div class="dog-image"><img src="~/img/dogbg.jpeg" alt="Your Mutt">
+                    </div>
                     <div class="dog-info">
                         <h3>Golden Retriever</h3>
                         <p><strong>Name:</strong> Max</p>
@@ -391,16 +396,18 @@
                 <div class="card">
                     <h2>Welcome Back</h2>
                     <p style="color: var(--light-text); margin-bottom: 1.5rem;">Sign in to your account</p>
-                    <form onsubmit="return false;">
+                    <form method="post" asp-page-handler="Login">
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" required>
+                            <label asp-for="Login.Email">Email</label>
+                            <input asp-for="Login.Email" type="email" required>
+                            <span asp-validation-for="Login.Email" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" required>
+                            <label asp-for="Login.Password">Password</label>
+                            <input asp-for="Login.Password" type="password" required>
+                            <span asp-validation-for="Login.Password" class="text-danger"></span>
                         </div>
-                        <button class="btn" style="width: 100%;">Sign In</button>
+                        <button type="submit" class="btn" style="width: 100%;">Sign In</button>
                     </form>
                 </div>
             </div>
@@ -411,24 +418,28 @@
             <div class="container">
                 <div class="card">
                     <h2>Register Your Pet</h2>
-                    <form onsubmit="return false;">
+                    <form method="post" asp-page-handler="RegisterPet">
                         <div class="form-group">
-                            <label for="petName">Pet's Name</label>
-                            <input type="text" id="petName" required>
+                            <label asp-for="RegisterPet.PetName">Pet's Name</label>
+                            <input asp-for="RegisterPet.PetName" required>
+                            <span asp-validation-for="RegisterPet.PetName" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="breed">Breed</label>
-                            <input type="text" id="breed" required>
+                            <label asp-for="RegisterPet.Breed">Breed</label>
+                            <input asp-for="RegisterPet.Breed" required>
+                            <span asp-validation-for="RegisterPet.Breed" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="age">Age</label>
-                            <input type="number" id="age" required>
+                            <label asp-for="RegisterPet.Age">Age</label>
+                            <input asp-for="RegisterPet.Age" type="number" required>
+                            <span asp-validation-for="RegisterPet.Age" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea id="description" rows="3"></textarea>
+                            <label asp-for="RegisterPet.Description">Description</label>
+                            <textarea asp-for="RegisterPet.Description" rows="3"></textarea>
+                            <span asp-validation-for="RegisterPet.Description" class="text-danger"></span>
                         </div>
-                        <button class="btn" style="width: 100%;">Register Pet</button>
+                        <button type="submit" class="btn" style="width: 100%;">Register Pet</button>
                     </form>
                 </div>
             </div>
@@ -439,8 +450,60 @@
             <div class="container">
                 <h2 style="text-align: center;">Lost Pets</h2>
                 <div class="search-container">
-                    <input type="text" class="search-box" placeholder="Search by breed, location, etc...">
-                    <button class="btn">Search</button>
+                    <form method="post" asp-page-handler="Search">
+                        <input type="text" class="search-box" name="usersearch"
+                            placeholder="Search by breed, location, etc...">
+                        <button class="btn">Search</button>
+                    </form>
+                    <div class="dog-grid">
+                    @if (results != null && results.Any())
+                    {
+                        <p>Search Results</p>
+                        @foreach (var result in results)
+                        {
+                            
+                            
+                                <div class="dog-card">
+                                    <div class="dog-image"></div>
+                                    <div class="dog-info">
+                                        <h3>@result.Breed</h3>
+                                        <p><strong>Name:</strong> Unknown</p>
+                                        <p><strong>Lost:</strong> @result.Location</p>
+                                        <p><strong>Date:</strong> @result.Date</p>
+                                        <p><strong>Info:</strong> @result.AdditionalInfo</p>
+                                        <a href="#" class="btn" style="margin-top: 1rem;">Contact Finder</a>
+
+                                    </div>
+                                </div>
+
+                            
+
+                        }
+                        
+                    }
+                    else
+                    {
+                        <p>Nothing Found Yet</p>
+                        var dogs = Model.GetLostFromFile();
+                        @foreach (var dog in dogs)
+                        {
+                            
+                                <div class="dog-card">
+                                    <div class="dog-image"></div>
+                                    <div class="dog-info">
+                                        <h3>@dog.Breed</h3>
+                                        <p><strong>Name:</strong> Unknown</p>
+                                        <p><strong>Lost:</strong> @dog.Location</p>
+                                        <p><strong>Date:</strong> @dog.Date</p>
+                                        <p><strong>Info:</strong> @dog.AdditionalInfo</p>
+                                        <a href="#" class="btn" style="margin-top: 1rem;">Contact Finder</a>
+                                    </div>
+                                </div>
+                            
+                        }
+                    }
+                    </div>
+                    <hr>
                 </div>
                 <div class="dog-grid">
                     <div class="dog-card">
@@ -465,6 +528,8 @@
                             <a href="#" class="btn" style="margin-top: 1rem;">Contact Finder</a>
                         </div>
                     </div>
+
+
                 </div>
             </div>
         </div>
@@ -474,33 +539,39 @@
             <div class="container">
                 <div class="card">
                     <h2>Report a Pet</h2>
-                    <form onsubmit="return false;">
+                    <form method="post" asp-page-handler="ReportPet">
                         <div class="form-group">
-                            <label for="reportType">Report Type</label>
-                            <select id="reportType" required>
+                            <label asp-for="ReportPet.ReportType">Report Type</label>
+                            <select asp-for="ReportPet.ReportType" required>
                                 <option value="lost">Lost Pet</option>
                                 <option value="found">Found Pet</option>
                             </select>
+                            <span asp-validation-for="ReportPet.ReportType" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="reportBreed">Breed</label>
-                            <input type="text" id="reportBreed" required>
+                            <label asp-for="ReportPet.Breed">Breed</label>
+                            <input asp-for="ReportPet.Breed" required>
+                            <span asp-validation-for="ReportPet.Breed" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="location">Location</label>
-                            <input type="text" id="location" required>
+                            <label asp-for="ReportPet.Location">Location</label>
+                            <input asp-for="ReportPet.Location" required>
+                            <span asp-validation-for="ReportPet.Location" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="date">Date</label>
-                            <input type="date" id="date" required>
+                            <label asp-for="ReportPet.Date">Date</label>
+                            <input asp-for="ReportPet.Date" type="date" required>
+                            <span asp-validation-for="ReportPet.Date" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="contactInfo">Contact Information</label>
-                            <input type="tel" id="contactInfo" required>
+                            <label asp-for="ReportPet.ContactInfo">Contact Information</label>
+                            <input asp-for="ReportPet.ContactInfo" type="tel" required>
+                            <span asp-validation-for="ReportPet.ContactInfo" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label for="additionalInfo">Additional Information</label>
-                            <textarea id="additionalInfo" rows="3"></textarea>
+                            <label asp-for="ReportPet.AdditionalInfo">Additional Information</label>
+                            <textarea asp-for="ReportPet.AdditionalInfo" rows="3"></textarea>
+                            <span asp-validation-for="ReportPet.AdditionalInfo" class="text-danger"></span>
                         </div>
                         <h1>QR Code Scanner</h1>
                         <div id="status">Click "Start Scanner" to begin</div>
@@ -508,8 +579,7 @@
                         <button id="stopButton" style="display: none;">Stop Scanner</button>
                         <div id="reader"></div>
                         <div id="result">Scan result will appear here</div>
-
-                        <button class="btn" style="width: 100%;">Submit Report</button>
+                        <button type="submit" class="btn" style="width: 100%;">Submit Report</button>
                     </form>
                 </div>
             </div>
@@ -623,7 +693,7 @@
                 stopButton.style.display = 'block';
                 statusDiv.textContent = 'Scanner is running...';
             }).catch((err) => {
-                statusDiv.textContent = `Error starting scanner: ${err}`;
+                statusDiv.textContent = `Error starting scanner: ${err} Ensure You Allowed Camera`;
             });
         }
 
@@ -647,6 +717,13 @@
             console.error(errorMessage);
         }
     </script>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <script>
+            alert('@Model.Message');
+        </script>
+    }
 </body>
 
 </html>

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\HP\\Desktop\\pupconect\\pupconect.csproj": {}
+    "C:\\Users\\HP\\Downloads\\pupconect (2)1\\pupconect\\pupconect.csproj": {}
   },
   "projects": {
-    "C:\\Users\\HP\\Desktop\\pupconect\\pupconect.csproj": {
+    "C:\\Users\\HP\\Downloads\\pupconect (2)1\\pupconect\\pupconect.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\HP\\Desktop\\pupconect\\pupconect.csproj",
+        "projectUniqueName": "C:\\Users\\HP\\Downloads\\pupconect (2)1\\pupconect\\pupconect.csproj",
         "projectName": "pupconect",
-        "projectPath": "C:\\Users\\HP\\Desktop\\pupconect\\pupconect.csproj",
+        "projectPath": "C:\\Users\\HP\\Downloads\\pupconect (2)1\\pupconect\\pupconect.csproj",
         "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\HP\\Desktop\\pupconect\\obj\\",
+        "outputPath": "C:\\Users\\HP\\Downloads\\pupconect (2)1\\pupconect\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -42,6 +42,18 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.8, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
