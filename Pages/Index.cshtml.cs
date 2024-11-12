@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
+
 
 
 namespace pupconect;
@@ -62,6 +64,7 @@ public class IndexModel : PageModel
                 (pet.Breed?.Contains(usersearch, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (pet.Location?.Contains(usersearch, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (pet.ContactInfo?.Contains(usersearch, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (pet.Tag?.Contains(usersearch, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (pet.AdditionalInfo?.Contains(usersearch, StringComparison.OrdinalIgnoreCase) ?? false)
             ).ToList();
 
@@ -74,29 +77,65 @@ public class IndexModel : PageModel
 
         return Page();
     }
-    
+
     public IActionResult OnPostLogin()
     {
         var users = GetUsersFromFile();
         users.Add(Login);
-        // {
-        //     PetName = RegisterPet.PetName,
-        //     Breed = RegisterPet.Breed,
-        //     Age = RegisterPet.Age,
-        //     Description = RegisterPet.Description
-        // };
         var jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "data", "loginData.json");
 
+        if (IsAuthenticated(Login))
+        {
+            
+            System.Console.WriteLine(Login.Name);
+            HttpContext.Session.SetString("Username", giveAuthenticatedUsername);
+            
+            return RedirectToPage("/Dashboard");
+        }
+        else{
+            return RedirectToPage("/AuthenError");
+        }
+       
+      
+    }
+    public IActionResult OnPostSignUp()
+    {
 
+
+        var users = GetUsersFromFile();
+        users.Add(Login);
+        var jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "data", "loginData.json");
+        System.Console.WriteLine("i worked");
+ 
         Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Data")); // Ensure 'Data' folder exists
         System.IO.File.WriteAllText(jsonFilePath, JsonSerializer.Serialize(users));
-        return RedirectToPage("/Index");
+        HttpContext.Session.SetString("Username", Login.Name);        
+        return RedirectToPage("/Dashboard");
 
-        if (!ModelState.IsValid)
-        {
-            return Page();
-        }
     }
+
+    public bool IsAuthenticated(LoginForm login)
+    {
+        List<LoginForm> logindata = GetUsersFromFile();
+
+        foreach (LoginForm data in logindata)
+        {
+            if (data.Email == login.Email && data.Password == login.Password)
+            {
+                System.Console.WriteLine("Login found in file");
+                System.Console.WriteLine(data.Email + " " + data.Password + " " + data.Name);
+                giveAuthenticatedUsername = data.Name;  
+                return true;
+            }
+            System.Console.WriteLine(data.Email + " " + data.Password + " " + data.Name);
+
+        }
+        System.Console.WriteLine("Login not found in file");
+        return false;
+    }
+
+    public string giveAuthenticatedUsername { get; set; }
+  
 
     private List<LoginForm> GetUsersFromFile()
     {
@@ -162,6 +201,9 @@ public class IndexModel : PageModel
 public class LoginForm
 {
     [Required]
+    public string Name { get; set; }
+
+    [Required]
     [EmailAddress]
     public string Email { get; set; }
 
@@ -192,6 +234,9 @@ public class ReportPetForm
 
     [Required]
     public string Breed { get; set; }
+
+    [Required]
+    public string Tag { get; set; }
 
     [Required]
     public string Location { get; set; }

@@ -310,6 +310,19 @@
             margin: 10px 0;
             color: #666;
         }
+        .signup-link {
+        text-align: center;
+        margin-top: 15px;
+        }
+
+        .signup-link{
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .signup-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -407,6 +420,39 @@
                             <input asp-for="Login.Password" type="password" required>
                             <span asp-validation-for="Login.Password" class="text-danger"></span>
                         </div>
+                        <p class="signup-link">
+                            Don't have an account? <a href="#signup" id="signupToggle" onclick="showPage('signup')">Sign Up</a>
+                        </p>
+                        <button type="submit" class="btn" style="width: 100%;">Sign In</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="signup">
+            <div class="container">
+                <div class="card">
+                    <h2>Join Us</h2>
+                    <p style="color: var(--light-text); margin-bottom: 1.5rem;">Crete your account</p>
+                    <form method="post" asp-page-handler="Signup">
+                        <div class="form-group">
+                            <label asp-for="Login.Name">Name</label>
+                            <input asp-for="Login.Name" type="text" required>
+                            <span asp-validation-for="Login.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Login.Email">Email</label>
+                            <input asp-for="Login.Email" type="email" required>
+                            <span asp-validation-for="Login.Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Login.Password">Password</label>
+                            <input asp-for="Login.Password" type="password" required>
+                            <span asp-validation-for="Login.Password" class="text-danger"></span>
+                        </div>
+                        <p class="signup-link">
+                            Already have an account? <a href="#signup" id="signupToggle" onclick="showPage('login')">Log In</a>
+                        </p>
                         <button type="submit" class="btn" style="width: 100%;">Sign In</button>
                     </form>
                 </div>
@@ -460,9 +506,7 @@
                     {
                         <p>Search Results</p>
                         @foreach (var result in results)
-                        {
-                            
-                            
+                        {                           
                                 <div class="dog-card">
                                     <div class="dog-image"></div>
                                     <div class="dog-info">
@@ -475,19 +519,14 @@
 
                                     </div>
                                 </div>
-
-                            
-
                         }
-                        
                     }
                     else
                     {
                         <p>Nothing Found Yet</p>
                         var dogs = Model.GetLostFromFile();
                         @foreach (var dog in dogs)
-                        {
-                            
+                        {                         
                                 <div class="dog-card">
                                     <div class="dog-image"></div>
                                     <div class="dog-info">
@@ -502,6 +541,7 @@
                             
                         }
                     }
+                    
                     </div>
                     <hr>
                 </div>
@@ -552,6 +592,11 @@
                             <label asp-for="ReportPet.Breed">Breed</label>
                             <input asp-for="ReportPet.Breed" required>
                             <span asp-validation-for="ReportPet.Breed" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ReportPet.Tag">Tag</label>
+                            <input asp-for="ReportPet.Tag" required>
+                            <span asp-validation-for="ReportPet.Tag" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="ReportPet.Location">Location</label>
@@ -610,11 +655,6 @@
         </div>
     </div>
 
-    <footer>
-        <div class="container">
-            <p>© 2024 PawConnect. All rights reserved.</p>
-        </div>
-    </footer>
 
     <script>
 
@@ -716,6 +756,27 @@
             // We can handle errors here if needed
             console.error(errorMessage);
         }
+    
+    
+    
+      @* document
+        .getElementById("signupToggle")
+        .addEventListener("click", function () {
+          document.getElementById("login").parentNode.style.display =
+            "none";
+          document.getElementById("signup").style.display = "block";
+        });
+
+      document
+        .getElementById("loginToggle")
+        .addEventListener("click", function () {
+          document.getElementById("signup").style.display = "none";
+          document.getElementById("login).parentNode.style.display =
+            "block";
+        }); *@
+    
+    
+    
     </script>
 
     @if (!string.IsNullOrEmpty(Model.Message))
